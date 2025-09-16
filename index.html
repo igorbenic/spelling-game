@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spelling Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+            overflow-x: hidden;
+        }
+        h1 {
+            font-size: 28px;
+        }
+        #nameInput {
+            font-size: 20px;
+            padding: 8px;
+            margin-bottom: 20px;
+        }
+        #startBtn {
+            font-size: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        #boxes {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .box {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        .bravo {
+            font-size: 60px;
+            font-weight: bold;
+            color: green;
+            margin-top: 20px;
+            animation: bounce 1s infinite alternate;
+        }
+        @keyframes bounce {
+            from { transform: scale(1); }
+            to { transform: scale(1.2); }
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            top: 0;
+            animation: fall 2s linear forwards;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<h1>Spelling Game</h1>
+<p>Enter your child’s name:</p>
+<input id="nameInput" type="text" placeholder="Enter name here" />
+<button id="startBtn">Start Game</button>
+
+<div id="boxes"></div>
+
+<!-- Sounds -->
+<audio id="correctSound">
+    <source src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" type="audio/ogg">
+</audio>
+<audio id="clapSound">
+    <source src="https://actions.google.com/sounds/v1/crowds/applause.ogg" type="audio/ogg">
+</audio>
+
+<script>
+    let targetName = "";
+    let currentIndex = 0;
+    let isPlaying = false;
+
+    const input = document.getElementById("nameInput");
+    const startBtn = document.getElementById("startBtn");
+    const boxesContainer = document.getElementById("boxes");
+    const correctSound = document.getElementById("correctSound");
+    const clapSound = document.getElementById("clapSound");
+
+    function launchConfetti(particles = 20) {
+        for (let i = 0; i < particles; i++) {
+            const confetti = document.createElement("div");
+            confetti.classList.add("confetti");
+            confetti.style.left = Math.random() * window.innerWidth + "px";
+            confetti.style.backgroundColor =
+                `hsl(${Math.random() * 360}, 100%, 50%)`;
+            confetti.style.animationDuration = (1 + Math.random()) + "s";
+            document.body.appendChild(confetti);
+
+            setTimeout(() => confetti.remove(), 2000);
+        }
+    }
+
+    function speak(text) {
+        if ("speechSynthesis" in window) {
+            const msg = new SpeechSynthesisUtterance("Bravo");
+            msg.lang = "hr-HR";
+            msg.text = "Bravo"
+            msg.rate = 0.9; // slower so it's clear for kids
+            speechSynthesis.speak(msg);
+        }
+    }
+
+    startBtn.addEventListener("click", () => {
+        isPlaying = true;
+        targetName = input.value.trim().toUpperCase();
+        if (targetName.length === 0) return;
+        currentIndex = 0;
+        boxesContainer.innerHTML = "";
+        for (let i = 0; i < targetName.length; i++) {
+            const box = document.createElement("div");
+            box.classList.add("box");
+            boxesContainer.appendChild(box);
+        }
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (!targetName) return;
+        if (!isPlaying) return;
+        const letter = e.key.toUpperCase();
+        if (letter === targetName[currentIndex]) {
+            const boxes = document.querySelectorAll(".box");
+            boxes[currentIndex].textContent = letter;
+            correctSound.currentTime = 0;
+            correctSound.play();
+            launchConfetti(10); // small burst for each letter
+            currentIndex++;
+        }
+        if (currentIndex === targetName.length) {
+            isPlaying = false;
+            setTimeout(() => {
+                boxesContainer.innerHTML = `<div class="bravo">BRAVO 🎉</div>`;
+                launchConfetti(100); // big celebration
+                clapSound.currentTime = 0;
+                clapSound.play();
+                speak("Bravo " + targetName); // 🎤 say the word
+            }, 300);
+        }
+    });
+</script>
+</body>
+</html>
