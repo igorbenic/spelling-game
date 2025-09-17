@@ -42,6 +42,16 @@
             color: white;
             border-color: #45a049;
         }
+        #targetNameDisplay {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2196F3;
+            margin: 20px 0;
+            text-align: center;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
         #boxes {
             margin-top: 30px;
             display: flex;
@@ -85,7 +95,7 @@
                 opacity: 0;
             }
         }
-        
+
         /* Virtual Keyboard Styles */
         #virtualKeyboard {
             display: none;
@@ -97,7 +107,7 @@
             margin-left: auto;
             margin-right: auto;
         }
-        
+
         .keyboard-row {
             display: flex;
             justify-content: center;
@@ -105,7 +115,7 @@
             margin-bottom: 8px;
             flex-wrap: wrap;
         }
-        
+
         .key {
             min-width: 40px;
             height: 50px;
@@ -122,25 +132,25 @@
             transition: all 0.2s;
             touch-action: manipulation;
         }
-        
+
         .key:hover, .key:active {
             background-color: #e8e8e8;
             border-color: #999;
             transform: scale(0.95);
         }
-        
+
         .key.pressed {
             background-color: #4CAF50;
             color: white;
             border-color: #45a049;
         }
-        
+
         /* Mobile responsive adjustments */
         @media (max-width: 768px), (pointer: coarse) {
             body {
                 padding: 20px 10px;
             }
-            
+
             .key {
                 min-width: 35px;
                 height: 45px;
@@ -156,6 +166,7 @@
 <button id="startBtn">Start Game</button>
 <button id="toggleKeyboardBtn">Show Keyboard</button>
 
+<div id="targetNameDisplay"></div>
 <div id="boxes"></div>
 
 <!-- Virtual Keyboard for Mobile -->
@@ -249,7 +260,7 @@
     function handleLetterInput(letter) {
         if (!targetName) return;
         if (!isPlaying) return;
-        
+
         const upperLetter = letter.toUpperCase();
         if (upperLetter === targetName[currentIndex]) {
             const boxes = document.querySelectorAll(".box");
@@ -258,7 +269,7 @@
             correctSound.play();
             launchConfetti(10); // small burst for each letter
             currentIndex++;
-            
+
             if (currentIndex === targetName.length) {
                 isPlaying = false;
                 setTimeout(() => {
@@ -277,6 +288,11 @@
         targetName = input.value.trim().toUpperCase();
         if (targetName.length === 0) return;
         currentIndex = 0;
+
+        // Display the target name above the boxes
+        const targetNameDisplay = document.getElementById("targetNameDisplay");
+        targetNameDisplay.textContent = targetName;
+
         boxesContainer.innerHTML = "";
         for (let i = 0; i < targetName.length; i++) {
             const box = document.createElement("div");
