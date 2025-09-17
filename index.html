@@ -52,6 +52,12 @@
             text-transform: uppercase;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
+        #emojiDisplay {
+            font-size: 72px;
+            text-align: center;
+            margin: 30px 0;
+            transition: transform 0.3s ease;
+        }
         #boxes {
             margin-top: 30px;
             display: flex;
@@ -168,6 +174,7 @@
 
 <div id="targetNameDisplay"></div>
 <div id="boxes"></div>
+<div id="emojiDisplay">😊</div>
 
 <!-- Virtual Keyboard for Mobile -->
 <div id="virtualKeyboard">
@@ -229,6 +236,7 @@
     const startBtn = document.getElementById("startBtn");
     const toggleKeyboardBtn = document.getElementById("toggleKeyboardBtn");
     const boxesContainer = document.getElementById("boxes");
+    const emojiDisplay = document.getElementById("emojiDisplay");
     const correctSound = document.getElementById("correctSound");
     const clapSound = document.getElementById("clapSound");
     const virtualKeyboard = document.getElementById("virtualKeyboard");
@@ -263,12 +271,23 @@
 
         const upperLetter = letter.toUpperCase();
         if (upperLetter === targetName[currentIndex]) {
+            // Correct letter - show big smile emoji
+            emojiDisplay.textContent = "😄";
+            emojiDisplay.style.transform = "scale(1.2)";
+
             const boxes = document.querySelectorAll(".box");
             boxes[currentIndex].textContent = upperLetter;
             correctSound.currentTime = 0;
             correctSound.play();
             launchConfetti(10); // small burst for each letter
             currentIndex++;
+
+            // Reset to default smile after a short delay
+            setTimeout(() => {
+                emojiDisplay.textContent = "😊";
+                emojiDisplay.style.transform = "scale(1)";
+            }, 1500);
+
 
             if (currentIndex === targetName.length) {
                 isPlaying = false;
@@ -280,6 +299,16 @@
                     speak("Bravo " + targetName); // 🎤 say the word
                 }, 300);
             }
+        }  else {
+            // Wrong letter - show sad emoji
+            emojiDisplay.textContent = "🙁";
+            emojiDisplay.style.transform = "scale(1.1)";
+
+            // Reset to default smile after a short delay
+            setTimeout(() => {
+                emojiDisplay.textContent = "😊";
+                emojiDisplay.style.transform = "scale(1)";
+            }, 1500);
         }
     }
 
@@ -292,6 +321,11 @@
         // Display the target name above the boxes
         const targetNameDisplay = document.getElementById("targetNameDisplay");
         targetNameDisplay.textContent = targetName;
+
+        // Reset emoji to default smile
+        emojiDisplay.textContent = "😊";
+        emojiDisplay.style.transform = "scale(1)";
+
 
         boxesContainer.innerHTML = "";
         for (let i = 0; i < targetName.length; i++) {
